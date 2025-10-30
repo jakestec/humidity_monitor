@@ -2,8 +2,21 @@ from schedule import every, repeat, run_pending
 from ecobee_wrapper import EccobeeWrapper
 import time
 import logging
+import sys
 
-logging.basicConfig(filename='humidity_monitor.log', filemode='w', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+# logging.basicConfig(filename='humidity_monitor.log', filemode='w', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+
+
+# Setup logger
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+# Log to stdout
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+
+# Attach handlers
+logger.addHandler(stream_handler)
 
 def convertTemp(temp):
 
@@ -44,11 +57,12 @@ def watchHumidity():
         set_params = {'format': 'json'}
         set_data = '{"selection" : {"selectionType":"registered","selectionMatch":""},"thermostat": {"settings":{"humidity":'+str(required_humidity)+'}}}'
         eb.post("thermostat", ep_params=set_params, data=set_data)
-        logging.info(f'Humidity change needed, outdoor temp: {outside_temp}, current setpoint: {humidity_setpoint}, new setpoint: {required_humidity}')
+        logger.info(f'Humidity change needed, outdoor temp: {outside_temp}, current setpoint: {humidity_setpoint}, new setpoint: {required_humidity}')
     else:
-        logging.info(f'No change needed, outdoor temp: {outside_temp}, keeping setpoint: {humidity_setpoint}')
+        logger.info(f'No change needed, outdoor temp: {outside_temp}, keeping setpoint: {humidity_setpoint}')
 
 if __name__ == "__main__":
+    logger.info(f'Starting Ecobee Humidity Monitor...')
     watchHumidity()
     while True:
         run_pending()

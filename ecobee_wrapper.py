@@ -2,6 +2,7 @@ import requests
 import urllib.parse
 import logging
 import os
+import sys
 
 class EccobeeWrapper:
     
@@ -21,7 +22,7 @@ class EccobeeWrapper:
         try:
             response = requests.post(url="https://api.ecobee.com/token", data = data)
         except requests.exceptions.RequestException as e:
-            logging.error(e)
+            logger.error(e)
 
         self.access_token = response.json().get('access_token')
     
@@ -38,12 +39,12 @@ class EccobeeWrapper:
         try:
             response = requests.request(method=http_method, url=full_url, headers=headers, params=ep_params, data=data)
         except requests.exceptions.RequestException as e:
-            logging.error(e)
+            logger.error(e)
 
         if 299 >= response.status_code >= 200:
             return response.json()
         else:
-            logging.error(f"Non-200 response code when trying request: {response.status_code}")
+            logger.error(f"Non-200 response code when trying request: {response.status_code}")
 
     def get(self, endpoint: str, ep_params: dict = None) -> list[dict]:
 

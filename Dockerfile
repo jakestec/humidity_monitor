@@ -1,4 +1,5 @@
 FROM python:3
+ENV PYTHONUNBUFFERED=1
 ARG api_key
 ARG refresh_token
 ENV API_KEY $api_key
